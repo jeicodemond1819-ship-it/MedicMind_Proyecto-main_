@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block titulo %}Reprogramar evento{% endblock %}
+{% block contenido %}
+<p><a href="{% url 'lista_eventos' %}">← Volver a la agenda</a></p>
+<h1>Reprogramar evento</h1>
+<div class="card"><h3>{{ evento.get_tipo_display }}</h3><p>{{ evento.adulto_mayor.nombre }}</p><p class="meta">Fecha actual: {{ evento.fecha|date:"d/m/Y" }}{% if evento.hora %} · {{ evento.hora|time:"H:i" }}{% endif %}</p></div>
+{% if errores %}<div class="errores" role="alert"><strong>Revise estos puntos:</strong><ul>{% for e in errores %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+<form method="post">
+{% csrf_token %}
+<div class="field"><label for="fecha">Nueva fecha</label><input id="fecha" name="fecha" type="date" value="{% if fecha_ingresada %}{{ fecha_ingresada }}{% else %}{{ evento.fecha|date:'Y-m-d' }}{% endif %}" required></div>
+{% if evento.tipo == 'CITA' %}<div class="field"><label for="hora">Nueva hora</label><input id="hora" name="hora" type="time" value="{% if hora_ingresada %}{{ hora_ingresada }}{% else %}{{ evento.hora|time:'H:i' }}{% endif %}" required></div>{% endif %}
+<div class="note">Al guardar le indicaremos a quién avisar del cambio.</div>
+<div class="actions"><button class="btn primary" type="submit">Guardar cambios</button><a class="btn" href="{% url 'lista_eventos' %}">Cancelar</a></div>
+</form>
+{% endblock %}

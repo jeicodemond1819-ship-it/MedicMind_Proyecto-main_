@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titulo %}Agenda{% endblock %}
+{% block contenido %}
+<h1>Agenda de eventos</h1>
+<p class="lead">Citas, retiros de medicamentos y renovaciones de receta.</p>
+<div class="chips" aria-label="Filtrar por estado">
+  <a class="btn" href="{% url 'lista_eventos' %}"{% if not estado_actual %} aria-current="true"{% endif %}>Todos</a>
+  {% for valor, texto in estados %}<a class="btn" href="?estado={{ valor }}"{% if estado_actual == valor %} aria-current="true"{% endif %}>{{ texto }}</a>{% endfor %}
+</div>
+<div class="actions" style="margin:0 0 1.2rem"><a class="btn primary" href="{% url 'lista_pacientes' %}">＋ Programar evento (elegir paciente)</a></div>
+<div class="list">
+{% for e in eventos %}
+<div class="card{% if e.estado == 'CANCELADA' %} bad{% elif e.estado == 'REALIZADA' %} ok{% endif %}">
+  <div class="top"><div><h3>{{ e.get_tipo_display }}</h3><p>{{ e.adulto_mayor.nombre }}</p></div>
+  <span class="badge {% if e.estado == 'PENDIENTE' %}warn{% elif e.estado == 'REALIZADA' %}ok{% else %}bad{% endif %}">{% if e.estado == 'PENDIENTE' %}⏳{% elif e.estado == 'REALIZADA' %}✔{% else %}✖{% endif %} {{ e.get_estado_display }}</span></div>
+  <p class="when">{{ e.fecha|date:"d/m/Y" }}{% if e.hora %} · {{ e.hora|time:"H:i" }}{% endif %}</p>
+  {% if e.vigencia_meses %}<p class="meta">Vigencia de la receta: {{ e.vigencia_meses }} mes{{ e.vigencia_meses|pluralize:"es" }}</p>{% endif %}
+  {% if e.tipo == 'RENOVACION' %}{% if e.receta %}{% include "receta_detalle.html" with receta=e.receta %}{% else %}<p class="meta">Sin receta asociada.</p>{% endif %}{% endif %}
+  <div class="actions">
+    {% if e.estado == 'PENDIENTE' %}
+    <form class="inline" method="post" action="{% url 'marcar_realizada' e.id %}">{% csrf_token %}<button class="btn ok" type="submit">✔ Marcar cumplida</button></form>
+    <a class="btn warn" href="{% url 'reprogramar_evento' e.id %}">↻ Reprogramar</a>
+    {% if e.tipo == 'RENOVACION' %}<a class="btn" href="{% url 'cambiar_receta' e.id %}">💊 Cambiar receta</a>{% endif %}
+    <form class="inline" method="post" action="{% url 'cancelar_evento' e.id %}" onsubmit="return confirm('¿Cancelar este evento?');">{% csrf_token %}<button class="btn bad" type="submit">✖ Cancelar</button></form>
+    {% endif %}
+    <a class="btn" href="{% url 'sugerir_canal' e.adulto_mayor.id %}">📞 A quién avisar</a>
+  </div>
+</div>
+{% empty %}
+<div class="card vacio"><h3>No hay eventos{% if estado_actual %} con ese estado{% endif %}</h3><p>Programe uno desde la lista de pacientes.</p></div>
+{% endfor %}
+</div>
+{% endblock %}

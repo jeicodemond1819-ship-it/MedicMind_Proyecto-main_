@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block titulo %}Pacientes{% endblock %}
+{% block contenido %}
+<h1>Pacientes</h1>
+<p class="lead">Adultos mayores registrados y cómo contactarlos.</p>
+<div class="actions" style="margin:0 0 1.2rem"><a class="btn primary" href="{% url 'registrar_paciente' %}">＋ Registrar paciente</a></div>
+<form method="get" role="search" class="field" style="margin:0 0 1.2rem">
+  <label for="rut">Buscar por RUT</label>
+  <input id="rut" name="rut" type="search" value="{{ rut }}" placeholder="Ej: 4123456-7">
+  <div class="actions"><button class="btn primary" type="submit">Buscar</button>{% if rut %}<a class="btn" href="{% url 'lista_pacientes' %}">Ver todos</a>{% endif %}</div>
+</form>
+<div class="list">
+{% for p in pacientes %}
+<div class="card">
+  <div class="top"><div><h3>{{ p.nombre }}</h3><p class="meta">RUT {{ p.rut }}</p></div>
+  <span class="badge {% if p.dependencia == 'AUTONOMO' %}ok{% elif p.dependencia == 'PARCIAL' %}warn{% else %}bad{% endif %}">{{ p.get_dependencia_display }}</span></div>
+  {% if p.no_sabe_leer %}<p class="meta">No sabe leer</p>{% endif %}
+  <div class="actions">
+    <a class="btn" href="{% url 'sugerir_canal' p.id %}">📞 A quién avisar</a>
+    <a class="btn primary" href="{% url 'crear_evento' p.id %}">📅 Programar evento</a>
+  </div>
+</div>
+{% empty %}
+<div class="card vacio">{% if rut %}<h3>No se encontraron pacientes</h3><p>No hay ningún paciente con ese RUT.</p>{% else %}<h3>Aún no hay pacientes</h3><p>Registre al primero para empezar.</p>{% endif %}<a class="btn primary" href="{% url 'registrar_paciente' %}">Registrar paciente</a></div>
+{% endfor %}
+</div>
+{% endblock %}

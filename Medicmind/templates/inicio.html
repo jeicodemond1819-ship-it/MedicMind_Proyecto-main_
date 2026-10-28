@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block titulo %}Inicio{% endblock %}
+{% block contenido %}
+<section class="welcome">
+  <p class="eyebrow">Portal de gestión</p>
+  <h1>Bienvenido a MedicMind</h1>
+  <p class="lead">Organiza pacientes, contactos y recordatorios desde un solo lugar.</p>
+  <div class="actions">
+    <a class="btn primary" href="{% url 'lista_pacientes' %}">Ver pacientes</a>
+    <a class="btn" href="{% url 'lista_eventos' %}">Abrir agenda</a>
+  </div>
+</section>
+
+<section aria-label="Resumen" class="grid two summary">
+  <div class="card stat">
+    <p class="meta">Pacientes registrados</p>
+    <p class="stat-value">{{ total_pacientes }}</p>
+    <a href="{% url 'lista_pacientes' %}">Consultar pacientes</a>
+  </div>
+  <div class="card stat">
+    <p class="meta">Eventos pendientes</p>
+    <p class="stat-value">{{ total_eventos_pendientes }}</p>
+    <a href="{% url 'lista_eventos' %}?estado=PENDIENTE">Revisar agenda</a>
+  </div>
+</section>
+
+<section aria-labelledby="proximos-titulo">
+  <div class="head">
+    <h2 id="proximos-titulo">Próximos eventos</h2>
+    <a href="{% url 'lista_eventos' %}">Ver toda la agenda</a>
+  </div>
+  <div class="list">
+    {% for evento in proximos_eventos %}
+      <article class="card upcoming">
+        <div>
+          <h3>{{ evento.get_tipo_display }}</h3>
+          <p>{{ evento.adulto_mayor.nombre }}</p>
+        </div>
+        <time class="when" datetime="{{ evento.fecha|date:'Y-m-d' }}">{{ evento.fecha|date:"d/m/Y" }}</time>
+      </article>
+    {% empty %}
+      <div class="card vacio">
+        <h3>No hay eventos próximos</h3>
+        <p>Cuando programes una cita o retiro, aparecerá aquí.</p>
+        <a href="{% url 'lista_pacientes' %}">Elegir paciente</a>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

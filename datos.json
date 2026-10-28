@@ -1,0 +1,196 @@
+[
+  {
+    "model": "Medicmind.cuidadorhogar",
+    "pk": 1,
+    "fields": {
+      "nombre": "Mercedes del Carmen Cifuentes",
+      "telefono": "+56912345678",
+      "tipo_celular": "TACTIL"
+    }
+  },
+  {
+    "model": "Medicmind.cuidadorhogar",
+    "pk": 2,
+    "fields": {
+      "nombre": "Luisa Cifuentes",
+      "telefono": "+56922334455",
+      "tipo_celular": "TACTIL"
+    }
+  },
+  {
+    "model": "Medicmind.adultomayor",
+    "pk": 1,
+    "fields": {
+      "nombre": "Jacinto Cifuentes",
+      "rut": "4123456-7",
+      "dependencia": "COMPLETO",
+      "no_sabe_leer": true,
+      "cuidadores": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "Medicmind.adultomayor",
+    "pk": 2,
+    "fields": {
+      "nombre": "Herminda Cifuentes",
+      "rut": "5987654-3",
+      "dependencia": "PARCIAL",
+      "no_sabe_leer": false,
+      "cuidadores": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "Medicmind.adultomayor",
+    "pk": 3,
+    "fields": {
+      "nombre": "Maria Carlina Güeicha",
+      "rut": "6543210-9",
+      "dependencia": "AUTONOMO",
+      "no_sabe_leer": false,
+      "cuidadores": []
+    }
+  },
+  {
+    "model": "Medicmind.celular",
+    "pk": 1,
+    "fields": {
+      "adulto_mayor": 2,
+      "numero": "+56911223344",
+      "tipo_celular": "BOTONES"
+    }
+  },
+  {
+    "model": "Medicmind.celular",
+    "pk": 2,
+    "fields": {
+      "adulto_mayor": 3,
+      "numero": "+56999887766",
+      "tipo_celular": "TACTIL"
+    }
+  },
+  {
+    "model": "Medicmind.medicamento",
+    "pk": 1,
+    "fields": {
+      "adulto_mayor": 1,
+      "nombre": "Quetiapina",
+      "dosis": "25mg por la noche"
+    }
+  },
+  {
+    "model": "Medicmind.medicamento",
+    "pk": 2,
+    "fields": {
+      "adulto_mayor": 2,
+      "nombre": "Losartán",
+      "dosis": "50mg cada 12 horas"
+    }
+  },
+  {
+    "model": "Medicmind.medicamento",
+    "pk": 3,
+    "fields": {
+      "adulto_mayor": 3,
+      "nombre": "Metformina",
+      "dosis": "850mg con el desayuno"
+    }
+  },
+  {
+    "model": "Medicmind.receta",
+    "pk": 1,
+    "fields": {
+      "adulto_mayor": 1,
+      "medicamentos": [
+        1
+      ],
+      "fecha_emision": "2026-10-25",
+      "vigencia_meses": 3
+    }
+  },
+  {
+    "model": "Medicmind.receta",
+    "pk": 2,
+    "fields": {
+      "adulto_mayor": 2,
+      "medicamentos": [
+        2
+      ],
+      "fecha_emision": "2026-03-15",
+      "vigencia_meses": 6
+    }
+  },
+  {
+    "model": "Medicmind.receta",
+    "pk": 3,
+    "fields": {
+      "adulto_mayor": 2,
+      "medicamentos": [
+        2
+      ],
+      "fecha_emision": "2026-09-15",
+      "vigencia_meses": 6
+    }
+  },
+  {
+    "model": "Medicmind.receta",
+    "pk": 4,
+    "fields": {
+      "adulto_mayor": 3,
+      "medicamentos": [
+        3
+      ],
+      "fecha_emision": "2026-10-01",
+      "vigencia_meses": 3
+    }
+  },
+  {
+    "model": "Medicmind.evento",
+    "pk": 1,
+    "fields": {
+      "adulto_mayor": 1,
+      "tipo": "RETIRO",
+      "fecha": "2026-10-25",
+      "estado": "PENDIENTE",
+      "vigencia_meses": 3
+    }
+  },
+  {
+    "model": "Medicmind.evento",
+    "pk": 2,
+    "fields": {
+      "adulto_mayor": 2,
+      "tipo": "CITA",
+      "fecha": "2026-10-28",
+      "estado": "PENDIENTE",
+      "vigencia_meses": null
+    }
+  },
+  {
+    "model": "Medicmind.evento",
+    "pk": 3,
+    "fields": {
+      "adulto_mayor": 3,
+      "tipo": "CITA",
+      "fecha": "2026-11-02",
+      "estado": "PENDIENTE",
+      "vigencia_meses": null
+    }
+  },
+  {
+    "model": "Medicmind.evento",
+    "pk": 4,
+    "fields": {
+      "adulto_mayor": 2,
+      "tipo": "RENOVACION",
+      "fecha": "2027-03-08",
+      "estado": "PENDIENTE",
+      "vigencia_meses": null,
+      "receta": 3
+    }
+  }
+]

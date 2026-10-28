@@ -1,0 +1,5 @@
+<div class="note receta">
+  <strong>Receta del {{ receta.fecha_emision|date:"d/m/Y" }}</strong><br>
+  Vigencia: {{ receta.vigencia_meses }} mes{{ receta.vigencia_meses|pluralize:"es" }} · Vence el {{ receta.vencimiento|date:"d/m/Y" }}<br>
+  {% if receta.medicamentos.all %}Medicamentos: {% for m in receta.medicamentos.all %}{{ m.nombre }} ({{ m.dosis }}){% if not forloop.last %}, {% endif %}{% endfor %}{% else %}Sin medicamentos asociados.{% endif %}
+</div>

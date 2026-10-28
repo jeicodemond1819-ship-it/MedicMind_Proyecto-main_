@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block titulo %}A quién avisar{% endblock %}
+{% block contenido %}
+<p><a href="{% url 'lista_pacientes' %}">← Volver a pacientes</a></p>
+<h1>A quién avisar</h1>
+<p class="lead">Paciente: <strong>{{ paciente.nombre }}</strong> · <span class="badge {% if paciente.dependencia == 'AUTONOMO' %}ok{% elif paciente.dependencia == 'PARCIAL' %}warn{% else %}bad{% endif %}">{{ paciente.get_dependencia_display }}</span></p>
+{% for c in contactos %}
+<div class="card">
+  <div class="top"><div><h3>{{ c.nombre }}</h3><p class="meta">{{ c.rol }}</p></div>
+  <span class="badge {% if c.canal == 'Llamada' %}warn{% else %}ok{% endif %}">{% if c.canal == 'Llamada' %}📞{% else %}💬{% endif %} Canal sugerido: {{ c.canal }}</span></div>
+  <p>Celular: <strong>{{ c.telefono }}</strong></p>
+  <p class="meta">{{ c.tipo_celular }}{% if c.rol == 'Adulto mayor' and paciente.no_sabe_leer %} · No sabe leer{% endif %}</p>
+  {% if c.canal == 'Llamada' %}<div class="actions"><a class="btn primary" href="tel:{{ c.telefono }}">📞 Llamar</a></div>{% endif %}
+</div>
+{% empty %}
+<div class="card bad"><h3>Sin contactos registrados</h3><p>Este paciente no tiene a quién avisar todavía.</p></div>
+{% endfor %}
+<div class="actions"><a class="btn primary" href="{% url 'crear_evento' paciente.id %}">📅 Programar evento</a><a class="btn" href="{% url 'lista_pacientes' %}">Ver pacientes</a></div>
+{% endblock %}

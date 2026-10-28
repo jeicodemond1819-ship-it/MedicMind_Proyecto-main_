@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block titulo %}Llamadas y SMS{% endblock %}
+{% block contenido %}
+<h1>Seguimiento de llamadas y SMS</h1>
+<p class="lead">Registra intentos de llamada, anota lo conversado y revisa respuestas SMS.</p>
+
+<section aria-labelledby="pendientes-titulo">
+  <h2 id="pendientes-titulo">Contactos pendientes</h2>
+  <div class="list">
+  {% for e in eventos_pendientes %}
+    <article class="card">
+      <div class="top">
+        <div><h3>{{ e.get_tipo_display }} · {{ e.adulto_mayor.nombre }}</h3><p class="when">{{ e.fecha|date:"d/m/Y" }}</p></div>
+        <span class="badge warn">Pendiente</span>
+      </div>
+      <div class="grid two communication-forms">
+        {% if e.necesita_llamada %}
+        <section class="card communication">
+          <h3>Registrar intento de llamada</h3>
+          {% if e.intentos_llamada_sin_respuesta %}
+            <p class="hint">Intentos sin respuesta: {{ e.intentos_llamada_sin_respuesta }} de 3.</p>
+            {% if e.proximo_intento_llamada %}
+              <p class="hint">Próximo intento disponible desde {{ e.proximo_intento_llamada|date:"H:i" }}.</p>
+            {% endif %}
+          {% endif %}
+          <form method="post" action="{% url 'registrar_estado_llamada' e.id %}">
+            {% csrf_token %}
+            <fieldset><legend>Resultado</legend><div class="choices">
+              {% for valor, etiqueta in estados_llamada %}
+              <label class="choice"><input type="radio" name="estado_llamada" value="{{ valor }}" required><span>{{ etiqueta }}</span></label>
+              {% endfor %}
+            </div></fieldset>
+            <div class="field"><label for="detalle-llamada-{{ e.id }}">¿Qué se habló en esta llamada?</label><textarea id="detalle-llamada-{{ e.id }}" name="detalle_llamada" rows="4"></textarea></div>
+            <button class="btn primary" type="submit">Guardar llamada</button>
+          </form>
+        </section>
+        {% endif %}
+        {% if e.sms_pendiente %}
+        <section class="card communication">
+          <h3>Registrar respuesta por SMS</h3>
+          <form method="post" action="{% url 'registrar_respuesta_sms' e.id %}">
+            {% csrf_token %}
+            <fieldset><legend>Respuesta recibida</legend><div class="choices">
+              {% for valor, etiqueta in estados_sms %}
+              <label class="choice"><input type="radio" name="estado_respuesta_sms" value="{{ valor }}" required><span>{{ etiqueta }}</span></label>
+              {% endfor %}
+            </div></fieldset>
+            <button class="btn primary" type="submit">Guardar respuesta SMS</button>
+          </form>
+        </section>
+        {% endif %}
+      </div>
+    </article>
+  {% empty %}
+    <div class="card vacio"><h3>No hay contactos pendientes</h3><p>Los eventos que requieran una llamada o respuesta SMS aparecerán aquí.</p></div>
+  {% endfor %}
+  </div>
+</section>
+
+<section aria-labelledby="llamadas-titulo">
+  <h2 id="llamadas-titulo">Llamadas registradas</h2>
+  <div class="list">
+  {% for e in llamadas_registradas %}
+    <article class="card">
+      <div class="top"><div><h3>{{ e.get_tipo_display }} · {{ e.adulto_mayor.nombre }}</h3><p class="when">{{ e.fecha|date:"d/m/Y" }}</p></div>
+        {% if e.estado_llamada %}
+          <span class="badge {% if e.estado_llamada == 'CONFIRMADO' %}ok{% elif e.estado_llamada == 'RECHAZADO' %}bad{% else %}warn{% endif %}">{{ e.get_estado_llamada_display }}</span>
+        {% else %}
+          <span class="badge warn">Sin respuesta · intento {{ e.intentos_llamada_sin_respuesta }} de 3</span>
+        {% endif %}
+      </div>
+      {% if e.detalle_llamada %}<p><strong>Notas de la llamada:</strong></p><p>{{ e.detalle_llamada|linebreaksbr }}</p>{% endif %}
+      {% if e.intentos_llamada_sin_respuesta and e.proximo_intento_llamada %}<p class="hint">Próximo intento desde {{ e.proximo_intento_llamada|date:"H:i" }}.</p>{% endif %}
+    </article>
+  {% empty %}
+    <div class="card vacio"><h3>Aún no hay llamadas registradas</h3><p>El resultado y las notas se mostrarán aquí después de guardar un intento.</p></div>
+  {% endfor %}
+  </div>
+</section>
+
+<section aria-labelledby="sms-titulo">
+  <h2 id="sms-titulo">Respuestas SMS registradas</h2>
+  <div class="list">
+  {% for e in respuestas_sms %}
+    <article class="card">
+      <div class="top"><div><h3>{{ e.get_tipo_display }} · {{ e.adulto_mayor.nombre }}</h3><p class="when">{{ e.fecha|date:"d/m/Y" }}</p></div>
+        <span class="badge {% if e.estado_respuesta_sms == 'CONFIRMADO' %}ok{% else %}warn{% endif %}">{{ e.get_estado_respuesta_sms_display }}</span>
+      </div>
+    </article>
+  {% empty %}
+    <div class="card vacio"><h3>Aún no hay respuestas SMS registradas</h3><p>Las respuestas recibidas o vencidas aparecerán aquí.</p></div>
+  {% endfor %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% load static %}<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block titulo %}Portal{% endblock %} · MedicMind</title>
+<meta name="theme-color" content="#08405f">
+<link rel="stylesheet" href="{% static 'Medicmind/styles.css' %}">
+</head>
+<body>
+<header><div class="in">
+  <a class="brand" href="{% url 'home' %}">MedicMind</a>
+  <nav aria-label="Principal">
+    <a href="{% url 'lista_pacientes' %}"{% if request.resolver_match.url_name == 'lista_pacientes' or request.resolver_match.url_name == 'sugerir_canal' %} aria-current="page"{% endif %}>Pacientes</a>
+    <a href="{% url 'registrar_paciente' %}"{% if request.resolver_match.url_name == 'registrar_paciente' %} aria-current="page"{% endif %}>Registrar paciente</a>
+    <a href="{% url 'lista_eventos' %}"{% if request.resolver_match.url_name == 'lista_eventos' or request.resolver_match.url_name == 'crear_evento' or request.resolver_match.url_name == 'reprogramar_evento' or request.resolver_match.url_name == 'cambiar_receta' %} aria-current="page"{% endif %}>Agenda</a>
+    <a href="{% url 'seguimiento_contactos' %}"{% if request.resolver_match.url_name == 'seguimiento_contactos' %} aria-current="page"{% endif %}>Llamadas y SMS</a>
+  </nav>
+</div></header>
+<main>
+{% if messages %}{% for m in messages %}<p class="aviso {{ m.tags }}" role="status">{{ m }}</p>{% endfor %}{% endif %}
+{% block contenido %}{% endblock %}
+</main>
+<footer>MedicMind · Portal de gestión</footer>
+</body>
+</html>

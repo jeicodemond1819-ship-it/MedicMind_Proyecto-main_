@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block titulo %}Programar evento{% endblock %}
+{% block contenido %}
+<p><a href="{% url 'lista_eventos' %}">← Volver a la agenda</a></p>
+<h1>Programar evento</h1>
+<p class="lead">Paciente: <strong>{{ paciente.nombre }}</strong>. Solo falta el tipo, la fecha y, si es cita, la hora.</p>
+{% if errores %}<div class="errores" role="alert"><strong>Revise estos puntos:</strong><ul>{% for e in errores %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+<form method="post" id="ev">
+{% csrf_token %}
+<fieldset><legend>Tipo de evento</legend><div class="choices">
+{% for valor, texto in tipos %}
+<label class="choice"><input type="radio" name="tipo" value="{{ valor }}" {% if forloop.first %}required{% endif %} {% if datos.tipo == valor or not datos.tipo and forloop.first %}checked{% endif %}><span>{{ texto }}</span></label>
+{% endfor %}
+</div></fieldset>
+<div class="field"><label for="fecha">Fecha</label><input id="fecha" name="fecha" type="date" value="{{ datos.fecha }}" required></div>
+<div class="field" id="bloque-hora"><label for="hora">Hora de la cita</label><input id="hora" name="hora" type="time" value="{{ datos.hora }}"></div>
+<div class="field" id="bloque-vigencia"><label for="vigencia_meses">Vigencia de la receta (opcional)</label>
+<p class="hint">Si indica la vigencia, se creará un aviso de renovación 7 días antes de que venza.</p>
+<select id="vigencia_meses" name="vigencia_meses"><option value="">Sin indicar</option>
+{% for m in vigencias %}<option value="{{ m }}" {% if datos.vigencia_meses == m|stringformat:"s" %}selected{% endif %}>{{ m }} mes{{ m|pluralize:"es" }}</option>{% endfor %}
+</select></div>
+
+<div id="bloque-receta">
+<h2>Receta a renovar</h2>
+{% if receta_vinculada %}
+<div class="field"><label for="receta_vinculada">🔒 Receta vinculada al paciente</label>
+<input id="receta_vinculada" type="text" value="Receta del {{ receta_vinculada.fecha_emision|date:'d/m/Y' }} · vence el {{ receta_vinculada.vencimiento|date:'d/m/Y' }}" disabled></div>
+<p class="meta">Vigencia: {{ receta_vinculada.vigencia_meses }} mes{{ receta_vinculada.vigencia_meses|pluralize:"es" }}. {% if receta_vinculada.medicamentos.all %}Medicamentos: {% for m in receta_vinculada.medicamentos.all %}{{ m.nombre }} ({{ m.dosis }}){% if not forloop.last %}, {% endif %}{% endfor %}.{% else %}Sin medicamentos asociados.{% endif %}</p>
+<p class="hint">Esta receta ya está vinculada y no se edita aquí. Si necesita cambiarla, use «Cambiar receta» en la agenda.</p>
+{% else %}
+<div class="note" role="status">Este paciente aún no tiene recetas registradas.</div>
+<p><a class="btn" href="{% url 'registrar_receta' paciente.id %}?next={{ request.path|urlencode }}">＋ Registrar receta</a></p>
+{% endif %}
+</div>
+
+<div class="actions"><button class="btn primary" type="submit">Guardar evento</button><a class="btn" href="{% url 'lista_eventos' %}">Cancelar</a></div>
+</form>
+<script>
+(function(){
+  var f=document.getElementById('ev');
+  function m(){
+    var r=f.querySelector('input[name="tipo"]:checked');
+    var t=r?r.value:'';
+    document.getElementById('bloque-hora').hidden=(t!=='CITA');
+    document.getElementById('hora').required=(t==='CITA');
+    document.getElementById('bloque-vigencia').hidden=(t!=='RETIRO');
+    document.getElementById('bloque-receta').hidden=(t!=='RENOVACION');
+  }
+  f.addEventListener('change',m);m();
+})();
+</script>
+{% endblock %}

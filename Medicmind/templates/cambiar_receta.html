@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Cambiar receta{% endblock %}
+{% block contenido %}
+<p><a href="{% url 'lista_eventos' %}">← Volver a la agenda</a></p>
+<h1>Cambiar receta</h1>
+<div class="card"><h3>{{ evento.get_tipo_display }}</h3><p>{{ evento.adulto_mayor.nombre }}</p><p class="meta">Fecha: {{ evento.fecha|date:"d/m/Y" }}</p></div>
+{% if errores %}<div class="errores" role="alert"><strong>Revise estos puntos:</strong><ul>{% for e in errores %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+{% if recetas %}
+<form method="post">
+{% csrf_token %}
+<fieldset><legend>Receta vinculada a esta renovación</legend><div class="choices">
+{% for r in recetas %}
+<label class="choice"><input type="radio" name="receta" value="{{ r.id }}" {% if forloop.first %}required{% endif %} {% if r.id == seleccionada %}checked{% endif %}><span>Receta del {{ r.fecha_emision|date:"d/m/Y" }} · vence el {{ r.vencimiento|date:"d/m/Y" }}{% if r.medicamentos.all %}<br>{% for m in r.medicamentos.all %}{{ m.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}</span></label>
+{% endfor %}
+</div></fieldset>
+<div class="actions"><button class="btn primary" type="submit">Guardar receta</button><a class="btn" href="{% url 'lista_eventos' %}">Cancelar</a></div>
+</form>
+{% else %}
+<div class="note" role="status">Este paciente aún no tiene recetas registradas.</div>
+{% endif %}
+<p><a class="btn" href="{% url 'registrar_receta' evento.adulto_mayor.id %}?next={{ request.path|urlencode }}">＋ Registrar receta nueva</a></p>
+{% endblock %}

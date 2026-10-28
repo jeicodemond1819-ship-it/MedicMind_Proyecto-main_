@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block titulo %}Registrar receta{% endblock %}
+{% block contenido %}
+<p><a href="{{ volver }}">← Volver</a></p>
+<h1>Registrar receta</h1>
+<p class="lead">Paciente: <strong>{{ paciente.nombre }}</strong>.</p>
+{% if errores %}<div class="errores" role="alert"><strong>Revise estos puntos:</strong><ul>{% for e in errores %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+<form method="post">
+{% csrf_token %}
+<input type="hidden" name="next" value="{{ volver }}">
+<div class="field"><label for="fecha_emision">Fecha de emisión de la receta</label><input id="fecha_emision" name="fecha_emision" type="date" value="{{ datos.fecha_emision }}" required></div>
+<div class="field"><label for="vigencia_meses">Vigencia de la receta</label>
+<select id="vigencia_meses" name="vigencia_meses" required><option value="">Seleccione</option>
+{% for m in vigencias %}<option value="{{ m }}" {% if datos.vigencia_meses == m|stringformat:"s" %}selected{% endif %}>{{ m }} mes{{ m|pluralize:"es" }}</option>{% endfor %}
+</select></div>
+<fieldset><legend>Medicamentos de esta receta (opcional)</legend>
+{% for m in medicamentos %}
+<div class="field"><label class="check"><input type="checkbox" name="medicamentos" value="{{ m.id }}" {% if m.id|stringformat:"s" in medicamentos_marcados %}checked{% endif %}> {{ m.nombre }} ({{ m.dosis }})</label></div>
+{% empty %}
+<p class="hint">Este paciente no tiene medicamentos registrados.</p>
+{% endfor %}
+</fieldset>
+<div class="actions"><button class="btn primary" type="submit">Guardar receta</button><a class="btn" href="{{ volver }}">Cancelar</a></div>
+</form>
+{% endblock %}

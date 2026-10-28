@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block titulo %}Registrar paciente{% endblock %}
+{% block contenido %}
+<p><a href="{% url 'lista_pacientes' %}">← Volver a pacientes</a></p>
+<h1>Registrar paciente</h1>
+<p class="lead">Solo pedimos los datos necesarios según su nivel de dependencia.</p>
+{% if errores %}<div class="errores" role="alert"><strong>Revise estos puntos:</strong><ul>{% for e in errores %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+<form method="post" id="ficha">
+{% csrf_token %}
+<div class="field"><label for="nombre">Nombre completo</label><input id="nombre" name="nombre" type="text" value="{{ datos.nombre }}" required></div>
+<div class="field"><label for="rut">RUT</label><input id="rut" name="rut" type="text" placeholder="12.345.678-9" value="{{ datos.rut }}" required></div>
+<fieldset><legend>Nivel de dependencia</legend><div class="choices">
+{% for valor, texto in dependencias %}
+<label class="choice"><input type="radio" name="dependencia" value="{{ valor }}" {% if forloop.first %}required{% endif %} {% if datos.dependencia == valor or not datos.dependencia and valor == 'AUTONOMO' %}checked{% endif %}><span>{{ texto }}</span></label>
+{% endfor %}
+</div></fieldset>
+<div class="field"><label class="check"><input type="checkbox" name="no_sabe_leer" id="no_sabe_leer" {% if datos.no_sabe_leer %}checked{% endif %}> El adulto mayor no sabe leer</label></div>
+
+<div id="bloque-am">
+<h2>Celular del adulto mayor</h2>
+<div class="field"><label for="celular_numero">Número de celular</label><input id="celular_numero" name="celular_numero" type="tel" placeholder="+56 9 1234 5678" value="{{ datos.celular_numero }}"></div>
+<div class="field"><label for="celular_tipo">Tipo de celular</label><select id="celular_tipo" name="celular_tipo">
+{% for valor, texto in tipos_celular %}<option value="{{ valor }}" {% if datos.celular_tipo == valor %}selected{% endif %}>{{ texto }}</option>{% endfor %}
+</select></div>
+</div>
+
+<div id="bloque-cu">
+<h2>Cuidador del hogar</h2>
+<div class="field"><label for="cuidador_nombre">Nombre del cuidador</label><input id="cuidador_nombre" name="cuidador_nombre" type="text" value="{{ datos.cuidador_nombre }}"></div>
+<div class="field"><label for="cuidador_telefono">Número de celular</label><input id="cuidador_telefono" name="cuidador_telefono" type="tel" placeholder="+56 9 1234 5678" value="{{ datos.cuidador_telefono }}"></div>
+<div class="field"><label for="cuidador_tipo">Tipo de celular</label><select id="cuidador_tipo" name="cuidador_tipo">
+{% for valor, texto in tipos_celular %}<option value="{{ valor }}" {% if datos.cuidador_tipo == valor %}selected{% endif %}>{{ texto }}</option>{% endfor %}
+</select></div>
+</div>
+
+<div class="note" role="status"><strong>Canal de recordatorio:</strong> <span id="canal"></span></div>
+<div class="actions"><button class="btn primary" type="submit">Guardar paciente</button><a class="btn" href="{% url 'lista_pacientes' %}">Cancelar</a></div>
+</form>
+<script>
+(function(){
+  var f=document.getElementById('ficha');
+  function actualizar(){
+    var r=f.querySelector('input[name="dependencia"]:checked'), d=r?r.value:'AUTONOMO';
+    document.getElementById('bloque-am').hidden=(d==='COMPLETO');
+    document.getElementById('bloque-cu').hidden=(d==='AUTONOMO');
+    var am=(f.no_sabe_leer.checked||f.celular_tipo.value==='BOTONES')?'Llamada':'SMS';
+    var cu=(f.cuidador_tipo.value==='BOTONES')?'Llamada':'SMS';
+    var t=d==='AUTONOMO'?'Adulto mayor por '+am:d==='COMPLETO'?'Cuidador del hogar por '+cu:'Adulto mayor por '+am+' y cuidador del hogar por '+cu;
+    document.getElementById('canal').textContent=t;
+  }
+  f.addEventListener('change',actualizar);actualizar();
+})();
+</script>
+{% endblock %}
